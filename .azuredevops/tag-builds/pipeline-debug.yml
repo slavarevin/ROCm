@@ -6,6 +6,24 @@ parameters:
 - name: checkoutRef
   type: string
   default: refs/tags/$(LATEST_RELEASE_TAG)
+- name: clrDebug
+  type: number
+  default: 13162
+- name: llvmDebug
+  type: number
+  default: 13175
+- name: rocmcmakeDebug
+  type: number
+  default: 11004
+- name: rocminfoDebug
+  type: number
+  default: 13187
+- name: rocprofilerDebug
+  type: number
+  default: 7626
+- name: rocrDebug
+  type: number
+  default: 11676
 
 resources:
   repositories:
@@ -23,7 +41,7 @@ trigger: none
 pr: none
 
 jobs:
-  - template: ${{ variables.CI_COMPONENT_PATH }}/rocRAND.yml
+  - template: ${{ variables.CI_COMPONENT_PATH }}/pipeline-debug.yml
     parameters:
       checkoutRepo: release_repo
       checkoutRef: ${{ parameters.checkoutRef }}
