@@ -96,10 +96,18 @@ jobs:
 - job: hip_tests_testing
   timeoutInMinutes: 240
   dependsOn: hip_tests
-  condition: and(succeeded(), eq(variables.ENABLE_GFX942_TESTS, 'true'), not(containsValue(split(variables.DISABLED_GFX942_TESTS, ','), variables['Build.DefinitionName'])))
+  condition:
+    and(
+      succeeded(),
+      eq(variables.ENABLE_GFX942_TESTS, 'true'),
+      not(containsValue(split(variables.DISABLED_GFX942_TESTS, ','), variables['Build.DefinitionName'])),
+      eq(variables['aggregatePipeline'], false)
+    )
   variables:
   - group: common
   - template: /.azuredevops/variables-global.yml
+  - name: aggregatePipeline
+    value: ${{ parameters.aggregatePipeline }}
   pool: $(JOB_TEST_POOL)
   workspace:
     clean: all

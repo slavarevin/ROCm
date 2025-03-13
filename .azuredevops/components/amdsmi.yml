@@ -12,13 +12,18 @@ parameters:
     - libdrm-dev
     - python3-pip
     - pkg-config
+# set to true if doing full build of ROCm stack
+# and dependencies are pulled from same pipeline
+- name: aggregatePipeline
+  type: boolean
+  default: false
 
 jobs:
 - job: amdsmi
   variables:
   - group: common
   - template: /.azuredevops/variables-global.yml
-  pool: 
+  pool:
     vmImage: ${{ variables.BASE_BUILD_POOL }}
   workspace:
     clean: all
@@ -43,10 +48,18 @@ jobs:
 
 - job: amdsmi_testing
   dependsOn: amdsmi
-  condition: and(succeeded(), eq(variables.ENABLE_GFX942_TESTS, 'true'), not(containsValue(split(variables.DISABLED_GFX942_TESTS, ','), variables['Build.DefinitionName'])))
+  condition:
+    and(
+      succeeded(),
+      eq(variables.ENABLE_GFX942_TESTS, 'true'),
+      not(containsValue(split(variables.DISABLED_GFX942_TESTS, ','), variables['Build.DefinitionName'])),
+      eq(variables['aggregatePipeline'], false)
+    )
   variables:
   - group: common
   - template: /.azuredevops/variables-global.yml
+  - name: aggregatePipeline
+    value: ${{ parameters.aggregatePipeline }}
   pool: $(JOB_TEST_POOL)
   workspace:
     clean: all
